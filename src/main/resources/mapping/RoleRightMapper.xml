@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.easystudy.mapper.RoleRightMapper" >
+  <resultMap id="BaseResultMap" type="com.easystudy.model.RoleRight" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="roleId" property="roleId" jdbcType="BIGINT" />
+    <result column="rightId" property="rightId" jdbcType="BIGINT" />
+    <result column="reserver1" property="reserver1" jdbcType="VARCHAR" />
+    <result column="reserver2" property="reserver2" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, roleId, rightId, reserver1, reserver2
+  </sql>
+  <!-- 基本列:别名 -->
+  <sql id="Alias_Column_List" >
+    ${alias}.id, ${alias}.roleId, ${alias}.rightId, ${alias}.reserver1, ${alias}.reserver2
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_role_right
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <!-- 分页获取所有权限 -->
+  <select id="selectByPage" resultMap="BaseResultMap">
+  	select 
+    <include refid="Base_Column_List" />
+    from t_role_right
+    order by id desc
+    limit #{pageIndex},#{pageSize}
+  </select>
+  <!-- 通过角色获取权限
+  List<RoleRight> selectByRoleName(@Param("roleName")String roleName);
+   -->
+  <select id="selectByRoleName" resultMap="BaseResultMap" parameterType="java.lang.String" >
+  	select 
+    <include refid="Alias_Column_List" ><property name="alias" value="rr"/></include>
+    from t_role_right as rr left join t_role as r
+    on rr.roleId = r.id
+    where r.name = #{roleName,jdbcType=VARCHAR}
+  </select>
+  <!-- 通过角色获取权限 -->
+  <select id="selectByRoleId" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+  	select 
+    <include refid="Base_Column_List" />
+    from t_role_right
+    where rile_id = #{roleId,jdbcType=BIGINT}
+  </select>
+  <!-- 通过权限ID获取对应权限 -->
+  <select id="selectByRightId" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+  	select 
+    <include refid="Base_Column_List" />
+    from t_role_right
+    where rightId = #{rightId,jdbcType=BIGINT}
+  </select>
+   <!-- 通过角色ID,权限ID获取对应权限 -->
+  <select id="selectByRoleRightId" resultMap="BaseResultMap" >
+  	select 
+    <include refid="Base_Column_List" />
+    from t_role_right
+    <where>
+     	<if test="roleId != null">
+	   		roleId = #{roleId,jdbcType=BIGINT}
+	   	</if>
+	    <if test="rightId != null">
+	   		and rightId = #{rightId,jdbcType=BIGINT}
+	   	</if>
+    </where>
+  </select>
+  <!--   通过属性获取数量
+	List<RoleRight> selectMaxByAttributes(@Param("roleId")Long roleId, @Param("rightId")Long rightId);
+			
+  -->
+  <select id="selectMaxByAttributes" resultType="long">
+  	select count(id) from t_role_right
+  	<where>
+     	<if test="roleId != null">
+	   		roleId = #{roleId,jdbcType=BIGINT}
+	   	</if>
+	    <if test="rightId != null">
+	   		and rightId = #{rightId,jdbcType=BIGINT}
+	   	</if>
+  	</where>
+  </select>	
+  <!-- 通过属性查找纪录 
+	List<RoleRight> selectByAttributes(@Param("roleId")Long roleId, @Param("rightId")Long rightId, 
+	@Param("pageIndex")Long pageIndex, @Param("pageSize")Long pageSize);
+			-->
+  <select id="selectByAttributes" resultMap="BaseResultMap">
+  	select
+  	<include refid="Base_Column_List" />
+  	from t_role_right
+  	<where>
+     	<if test="roleId != null">
+	   		roleId = #{roleId,jdbcType=BIGINT}
+	   	</if>
+	    <if test="rightId != null">
+	   		and rightId = #{rightId,jdbcType=BIGINT}
+	   	</if>
+  	</where>
+  	limit #{pageIndex}, #{pageSize}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from t_role_right
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <!-- int deleteByRoleId(Long roleId); -->
+  <delete id="deleteByRoleId" >
+    delete from t_role_right
+    where roleId = #{roleId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insertBatch" parameterType="java.util.List">
+	insert into t_role_right (id, roleId, rightId, reserver1, reserver2)
+	values
+	<foreach collection="list" item="item" index="index" separator=",">
+	(
+		#{item.id,jdbcType=BIGINT}, 
+		#{item.roleId,jdbcType=BIGINT}, 
+		#{item.rightId,jdbcType=BIGINT}, 
+      	#{item.reserver1,jdbcType=VARCHAR}, 
+      	#{item.reserver2,jdbcType=VARCHAR}
+	)
+	</foreach>
+  </insert>
+  <insert id="insert" parameterType="com.easystudy.model.RoleRight" useGeneratedKeys="true" keyProperty="id" >
+    insert into t_role_right (id, roleId, rightId, reserver1, reserver2)
+    values (#{id,jdbcType=BIGINT}, #{roleId,jdbcType=BIGINT}, #{rightId,jdbcType=BIGINT}, 
+      #{reserver1,jdbcType=VARCHAR}, #{reserver2,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.easystudy.model.RoleRight" useGeneratedKeys="true" keyProperty="id" >
+    insert into t_role_right
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="roleId != null" >
+        roleId,
+      </if>
+      <if test="rightId != null" >
+        rightId,
+      </if>
+      <if test="reserver1 != null" >
+        reserver1,
+      </if>
+      <if test="reserver2 != null" >
+        reserver2,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="roleId != null" >
+        #{roleId,jdbcType=BIGINT},
+      </if>
+      <if test="rightId != null" >
+        #{rightId,jdbcType=BIGINT},
+      </if>
+      <if test="reserver1 != null" >
+        #{reserver1,jdbcType=VARCHAR},
+      </if>
+      <if test="reserver2 != null" >
+        #{reserver2,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.easystudy.model.RoleRight" >
+    update t_role_right
+    <set >
+      <if test="roleId != null" >
+        roleId = #{roleId,jdbcType=BIGINT},
+      </if>
+      <if test="rightId != null" >
+        rightId = #{rightId,jdbcType=BIGINT},
+      </if>
+      <if test="reserver1 != null" >
+        reserver1 = #{reserver1,jdbcType=VARCHAR},
+      </if>
+      <if test="reserver2 != null" >
+        reserver2 = #{reserver2,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.easystudy.model.RoleRight" >
+    update t_role_right
+    set 
+      roleId = #{roleId,jdbcType=BIGINT},
+      rightId = #{rightId,jdbcType=BIGINT},
+      reserver1 = #{reserver1,jdbcType=VARCHAR},
+      reserver2 = #{reserver2,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

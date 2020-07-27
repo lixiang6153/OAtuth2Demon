@@ -1,0 +1,457 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.easystudy.mapper.UserMapper" >
+  <!-- 结果映射集 -->
+  <resultMap id="BaseResultMap" type="com.easystudy.model.User" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="username" property="username" jdbcType="VARCHAR" />
+    <result column="password" property="password" jdbcType="VARCHAR" />
+    <result column="mobile" property="mobile" jdbcType="VARCHAR" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
+    <result column="userType" property="userType" jdbcType="TINYINT" />
+    <result column="relativeId" property="relativeId" jdbcType="VARCHAR" />
+    <result column="head" property="head" jdbcType="VARCHAR" />
+    <result column="admin" property="admin" jdbcType="TINYINT" />
+    <result column="enabled" property="enabled" jdbcType="TINYINT" />
+    <result column="expired" property="expired" jdbcType="TINYINT" />
+    <result column="locked" property="locked" jdbcType="TINYINT" />
+    <result column="createUser" property="createUser" jdbcType="VARCHAR" />
+    <result column="createTime" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="reserver1" property="reserver1" jdbcType="VARCHAR" />
+    <result column="reserver2" property="reserver2" jdbcType="VARCHAR" />
+  </resultMap>
+  <!-- 基本列：复用 -->
+  <sql id="Base_Column_List" >
+    t_user.id, 
+    t_user.username, t_user.password, 
+    t_user.mobile, t_user.email, 
+    t_user.userType, t_user.relativeId,
+    t_user.head, 
+    t_user.admin,
+    t_user.enabled,
+    t_user.expired,t_user.locked,
+    t_user.createUser,
+    t_user.createTime,
+    t_user.reserver1, t_user.reserver2
+  </sql>
+  <sql id="Base_Column_List2" >
+    u.id, 
+    u.username, u.password, 
+    u.mobile, u.email, 
+    u.userType, 
+    u.relativeId,
+    u.head,
+    u.admin, 
+    u.enabled, 
+    u.expired, 
+    u.locked,
+    u.createUser,
+    u.createTime,
+    u.reserver1, u.reserver2
+  </sql>
+  <!-- 基本列:别名 -->
+  <sql id="Alias_Column_List" >
+  	${alias}.id, 
+    ${alias}.username, 
+    ${alias}.password, 
+    ${alias}.mobile, 
+    ${alias}.email, 
+    ${alias}.userType, 
+    ${alias}.relativeId,
+    ${alias}.head,
+    ${alias}.admin,
+    ${alias}.enabled,
+    ${alias}.expired,
+    ${alias}.locked,
+    ${alias}.createUser,
+    ${alias}.createTime,
+    ${alias}.reserver1, 
+    ${alias}.reserver2
+  </sql>
+  <!-- 通过主键检索 -->
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_user
+    where t_user.id = #{id,jdbcType=BIGINT}
+  </select>
+  <!-- 检索所有记录 -->
+  <select id="selectAll" resultMap="BaseResultMap">
+  	select 
+    <include refid="Base_Column_List" />
+    from t_user
+  </select>
+  <!-- 查找总数 -->
+  <select id="selectMax"  resultType="long">
+    select count(1) from t_user 
+  </select>
+  <!-- 检索所有记录 -->
+  <select id="selectByPage" resultMap="BaseResultMap">
+  	select 
+    <include refid="Base_Column_List" />
+    from t_user
+    order by id desc
+    limit #{pageIndex},#{pageSize}
+  </select>
+  <!-- 通过用户名检索 -->
+  <select id="selectByUsername" resultMap="BaseResultMap" parameterType="java.lang.String" >
+  	select 
+    <include refid="Base_Column_List" />
+    from t_user
+    where t_user.username = #{username,jdbcType=VARCHAR}
+  </select>
+  <!-- 
+  	通过手机号检索
+  	User selectCellphone(@Param("cellPhone")String cellPhone, @Param("userType")Long userType); 
+  -->
+  <select id="selectCellphone" resultMap="BaseResultMap" parameterType="java.lang.String" >
+  	select 
+    <include refid="Base_Column_List" />
+    from t_user
+    <where>
+    	<if test="cellPhone != null and cellPhone.length() > 0">
+    		mobile = #{cellPhone,jdbcType=VARCHAR}
+    	</if>
+    	<if test="userType != null">
+    		and userType = #{userType, jdbcType=TINYINT}
+    	</if>
+    </where>
+  </select>
+  <!-- 通过角色id检索 -->
+  <select id="selectByRoleId" resultMap="BaseResultMap">
+  	select
+  	<include refid="Base_Column_List2" />
+    from t_user u, t_user_role ur
+    where
+    u.id = ur.user_id and ur.t_role_id=#{role_id, jdbcType=VARCHAR}
+  </select>
+  <!-- 
+  	通过openid获取用户信息
+  	User selectByOpenId(@Param("userType")Long userType, @Param("openId")String openId, @Param("openIdType")String openIdType);
+   -->
+  <!-- 通过用户ID检索 -->
+  <select id="selectByOpenId" resultMap="BaseResultMap">
+    select 
+    <include refid="Alias_Column_List" ><property name="alias" value="u"/></include>
+    from t_user u 
+    left join t_wxapp app on u.username=app.username
+   	<where>
+		<if test="userType != null">
+			userType = #{userType,jdbcType=TINYINT}
+		</if>
+		<if test="openId != null and openId.length() > 0">
+			and openId = #{openId,jdbcType=VARCHAR}
+		</if>
+		<if test="openIdType != null">
+			and type = #{openIdType,jdbcType=TINYINT}
+		</if>
+  	</where>
+  </select>
+  <!--   通过属性获取数量
+	Long selectMaxByAttributes(@Param("username")String username, 
+			@Param("phone")String phone, @Param("openId")String openId, 
+			@Param("userType")Long userType, @Param("relativeId")String relativeId,
+			@Param("ignoreUser")String ignoreUser);
+			
+  -->
+  <select id="selectMaxByAttributes" resultType="long">
+  	select count(id) from t_user
+  	<where>
+  		<if test="username != null and username.length() > 0">
+  			username like CONCAT('%',#{username,jdbcType=VARCHAR},'%')
+  		</if>
+  		<if test="phone != null and phone.length() > 0">
+  			and mobile = #{phone,jdbcType=VARCHAR}
+  		</if>
+  		<if test="userType != null">
+  			and userType = #{userType,jdbcType=TINYINT}
+  		</if>
+  		<if test="relativeId != null and relativeId.length() > 0">
+  			and relativeId = #{relativeId,jdbcType=VARCHAR}
+  		</if>
+  		<if test="createUser != null and createUser.length() > 0">
+  			and createUser = #{createUser,jdbcType=VARCHAR}
+  		</if>
+  		<if test="ignoreUser != null and ignoreUser.length() > 0">
+  			and username != #{ignoreUser,jdbcType=VARCHAR}
+  		</if>
+  		<if test="admin != null">
+  			and admin = #{admin,jdbcType=TINYINT}
+  		</if>
+  	</where>
+  </select>	
+  <!-- 通过属性查找纪录 
+	List<User> selectByAttributes(@Param("username")String username, 
+			@Param("phone")String phone, @Param("openId")String openId, 
+			@Param("userType")Long userType, @Param("relativeId")String relativeId,
+			@Param("orderProp")String orderProp, @Param("order")String order, 
+			@Param("pageIndex")Long pageIndex, @Param("pageSize")Long pageSize);  
+			-->
+  <select id="selectByAttributes" resultMap="BaseResultMap">
+  	select
+  	<include refid="Base_Column_List" />
+  	from t_user
+  	<where>
+  		<if test="username != null and username.length() > 0">
+  			username like CONCAT('%',#{username,jdbcType=VARCHAR},'%')
+  		</if>
+  		<if test="phone != null and phone.length() > 0">
+  			and mobile = #{phone,jdbcType=VARCHAR}
+  		</if>
+  		<if test="userType != null">
+  			and userType = #{userType,jdbcType=TINYINT}
+  		</if>
+  		<if test="relativeId != null and relativeId.length() > 0">
+  			and relativeId = #{relativeId,jdbcType=VARCHAR}
+  		</if>
+  		<if test="createUser != null and createUser.length() > 0">
+  			and createUser = #{createUser,jdbcType=VARCHAR}
+  		</if>
+  		<if test="ignoreUser != null and ignoreUser.length() > 0">
+  			and username != #{ignoreUser,jdbcType=VARCHAR}
+  		</if>
+  		<if test="admin != null">
+  			and admin = #{admin,jdbcType=TINYINT}
+  		</if>
+  	</where>
+  	<if test="orderProp != null and orderProp.length() > 0">
+		order by
+		<choose>
+			<when test="order != null and order != 'desc' and order != 'asc'">
+				${orderProp} asc
+			</when>
+			<when test="order == null">
+				${orderProp}
+			</when>
+			<otherwise >
+				${orderProp} ${order}
+			</otherwise>
+		</choose>
+	</if>
+  	limit #{pageIndex}, #{pageSize}
+  </select>
+  <!-- 通过主键删除 -->
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from t_user
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <!-- 通过主键删除 -->
+  <delete id="deleteByUserName" parameterType="java.lang.String" >
+    delete from t_user
+    where username = #{username,jdbcType=VARCHAR}
+  </delete>
+  <!-- 通过主键删除
+  void deleteByRelativeId(@Param("relativeId")String relativeId);  
+   -->
+  <delete id="deleteByRelativeId" parameterType="java.lang.String" >
+    delete from t_user
+    where relativeId = #{relativeId,jdbcType=VARCHAR}
+  </delete>
+  <!-- void deleteByCellphoneAndType(@Param("phone")String phone, @Param("userType")Long userType); -->
+  <delete id="deleteByCellphoneAndType">
+    delete from t_user
+    where mobile = #{phone,jdbcType=VARCHAR} and userType = #{userType,jdbcType=TINYINT}
+  </delete>
+  <!-- 保存记录 -->
+  <insert id="insert" parameterType="com.easystudy.model.User" useGeneratedKeys="true" keyProperty="id" >
+    insert into t_user (id, username, password,
+      mobile, email, userType, 
+      relativeId,head,
+      admin, 
+      enabled, 
+      expired, locked, 
+      createUser,
+      createTime,
+      reserver1, reserver2)
+      values (#{id,jdbcType=BIGINT},  
+      #{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
+      #{mobile,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, 
+      #{userType,jdbcType=TINYINT}, 
+      #{relativeId,jdbcType=VARCHAR}, 
+      #{head,jdbcType=VARCHAR}, 
+      #{admin,jdbcType=TINYINT}, 
+      #{enabled,jdbcType=TINYINT}, 
+      #{expired,jdbcType=TINYINT}, 
+      #{locked,jdbcType=TINYINT}, 
+      #{createUser,jdbcType=VARCHAR},
+      #{createTime,jdbcType=TIMESTAMP},
+      #{reserver1,jdbcType=VARCHAR}, 
+      #{reserver2,jdbcType=VARCHAR})
+  </insert>
+  <!-- 保存记录的非空列 -->
+  <insert id="insertSelective" parameterType="com.easystudy.model.User" useGeneratedKeys="true" keyProperty="id" >
+    insert into t_user
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="username != null" >
+        username,
+      </if>
+      <if test="password != null" >
+        password,
+      </if>
+      <if test="mobile != null" >
+        mobile,
+      </if>
+      <if test="email != null" >
+        email,
+      </if>
+      <if test="userType != null" >
+        userType,
+      </if>
+      <if test="relativeId != null" >
+        relativeId,
+      </if>
+      <if test="head != null" >
+        head,
+      </if>
+      <if test="admin != null" >
+        admin,
+      </if>
+      <if test="enabled != null" >
+        enabled,
+      </if>
+      <if test="expired != null" >
+        expired,
+      </if>
+      <if test="locked != null" >
+        locked,
+      </if>
+      <if test="createUser != null" >
+        createUser,
+      </if>
+      <if test="createTime != null" >
+        createTime,
+      </if>
+      <if test="reserver1 != null" >
+        reserver1,
+      </if>
+      <if test="reserver2 != null" >
+        reserver2,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="username != null" >
+        #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null" >
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="mobile != null" >
+        #{mobile,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null" >
+        #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="userType != null" >
+        #{userType,jdbcType=TINYINT},
+      </if>
+      <if test="relativeId != null" >
+        #{relativeId,jdbcType=VARCHAR},
+      </if>
+      <if test="head != null" >
+        #{head,jdbcType=VARCHAR},
+      </if>
+      <if test="admin != null" >
+        #{admin,jdbcType=TINYINT},
+      </if>
+      <if test="enabled != null" >
+        #{enabled,jdbcType=TINYINT},
+      </if>
+      <if test="expired != null" >
+        #{expired,jdbcType=TINYINT},
+      </if>
+      <if test="locked != null" >
+        #{locked,jdbcType=TINYINT},
+      </if>
+      <if test="createUser != null" >
+        #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="reserver1 != null" >
+        #{reserver1,jdbcType=VARCHAR},
+      </if>
+      <if test="reserver2 != null" >
+        #{reserver2,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <!-- 通过主键更新非空列 -->
+  <update id="updateByPrimaryKeySelective" parameterType="com.easystudy.model.User" >
+    update t_user
+    <set >
+      <if test="username != null" >
+        username = #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null" >
+        password = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="mobile != null" >
+        mobile = #{mobile,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null" >
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="userType != null" >
+        userType = #{userType,jdbcType=TINYINT},
+      </if>
+      <if test="relativeId != null" >
+        relativeId = #{relativeId,jdbcType=VARCHAR},
+      </if>
+      <if test="head != null" >
+        head = #{head,jdbcType=VARCHAR},
+      </if>
+      <if test="admin != null" >
+        admin = #{admin,jdbcType=TINYINT},
+      </if>
+      <if test="enabled != null" >
+        enabled = #{enabled,jdbcType=TINYINT},
+      </if>
+      <if test="expired != null" >
+        expired = #{expired,jdbcType=TINYINT},
+      </if>
+      <if test="locked != null" >
+        locked = #{locked,jdbcType=TINYINT},
+      </if>
+      <if test="createUser != null" >
+        createUser = #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        createTime = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="reserver1 != null" >
+        reserver1 = #{reserver1,jdbcType=VARCHAR},
+      </if>
+      <if test="reserver2 != null" >
+        reserver2 = #{reserver2,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <!-- 通过主键更新列 -->
+  <update id="updateByPrimaryKey" parameterType="com.easystudy.model.User" >
+    update t_user set
+      username = #{username,jdbcType=VARCHAR},
+      password = #{password,jdbcType=VARCHAR},
+      mobile = #{mobile,jdbcType=VARCHAR},
+      email = #{email,jdbcType=VARCHAR},
+      userType = #{userType,jdbcType=TINYINT},
+      relativeId = #{relativeId,jdbcType=VARCHAR},
+      head = #{head,jdbcType=VARCHAR},
+      admin = #{admin,jdbcType=TINYINT},
+      enabled = #{enabled,jdbcType=TINYINT},
+      expired = #{expired,jdbcType=TINYINT},
+      locked = #{locked,jdbcType=TINYINT},
+      createUser = #{createUser,jdbcType=VARCHAR},
+      createTime = #{createTime,jdbcType=TIMESTAMP},
+      reserver1 = #{reserver1,jdbcType=VARCHAR},
+      reserver2 = #{reserver2,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

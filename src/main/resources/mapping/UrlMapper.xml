@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.easystudy.mapper.UrlMapper" >
+  <resultMap id="BaseResultMap" type="com.easystudy.model.SysUrl" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="url" property="url" jdbcType="VARCHAR" />
+    <result column="description" property="description" jdbcType="VARCHAR" />
+    <result column="modify" property="modify" jdbcType="TINYINT" />
+    <result column="reserver1" property="reserver1" jdbcType="VARCHAR" />
+    <result column="reserver2" property="reserver2" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, url, description, modify, reserver1, reserver2
+  </sql>
+  <sql id="Alias_Column_List" >
+    ${alias}.id, 
+    ${alias}.url, 
+    ${alias}.description, 
+    ${alias}.modify, 
+    ${alias}.reserver1, 
+    ${alias}.reserver2
+  </sql>
+  <sql id="Alias_Column_List2" >
+    ${alias}.id, 
+    ${alias}.url, 
+    ${alias}.description, 
+    ${alias}.modify, 
+    ${alias}.reserver1, 
+    ${alias}.reserver2
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_url
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <select id="selectByPage" resultMap="BaseResultMap" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_url
+    limit #{pageIndex},#{pageSize}
+  </select>
+  <select id="selectByUrl" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_url
+    where url = #{url,jdbcType=VARCHAR}
+  </select>
+  <!-- List<SysUrl> selectByUserId(@Param("userId")Long userId); -->
+  <select id="selectByUserId" resultMap="BaseResultMap">
+    select 
+    	<include refid="Alias_Column_List2" ><property name="alias" value="url"/></include>
+    from t_url url
+    left join t_right_item it on it.urlId = url.id
+    left join t_role_right rr on rr.rightId = it.rightId
+    left join t_user_role ur on ur.roleId = rr.roleId
+    where ur.userId = #{userId,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from t_url
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.easystudy.model.SysUrl" useGeneratedKeys="true" keyProperty="id" >
+    insert into t_url (id, url, description, modify, reserver1, reserver2)
+    values (
+      #{id,jdbcType=BIGINT}, 
+      #{url,jdbcType=VARCHAR}, 
+      #{description,jdbcType=VARCHAR}, #{modify,jdbcType=TINYINT},
+      #{reserver1,jdbcType=VARCHAR}, #{reserver2,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.easystudy.model.SysUrl" useGeneratedKeys="true" keyProperty="id" >
+    insert into t_url
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="url != null" >
+        url,
+      </if>
+      <if test="description != null" >
+        description,
+      </if>
+      <if test="modify != null" >
+        modify,
+      </if>
+      <if test="reserver1 != null" >
+        reserver1,
+      </if>
+      <if test="reserver2 != null" >
+        reserver2,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="url != null" >
+        #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null" >
+        #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="modify != null" >
+        #{modify,jdbcType=TINYINT},
+      </if>
+      <if test="reserver1 != null" >
+        #{reserver1,jdbcType=VARCHAR},
+      </if>
+      <if test="reserver2 != null" >
+        #{reserver2,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.easystudy.model.SysUrl" >
+    update t_url
+    <set >
+      <if test="url != null" >
+        url = #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null" >
+        description = #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="modify != null" >
+        modify = #{modify,jdbcType=TINYINT},
+      </if>
+      <if test="reserver1 != null" >
+        reserver1 = #{reserver1,jdbcType=VARCHAR},
+      </if>
+      <if test="reserver2 != null" >
+        reserver2 = #{reserver2,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.easystudy.model.SysUrl" >
+    update t_url
+    set	  
+	      url = #{url,jdbcType=VARCHAR},
+	      description = #{description,jdbcType=VARCHAR},
+	      modify = #{modify,jdbcType=TINYINT},
+	      reserver1 = #{reserver1,jdbcType=VARCHAR},
+	      reserver2 = #{reserver2,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

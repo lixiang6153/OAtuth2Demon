@@ -1,0 +1,65 @@
+server:
+  port: 7000
+spring:
+  application:
+    name: auth
+  #数据源配置
+  datasource:
+    name: auth
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/auth_demon?serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=false
+      username: root
+      password: root
+      initial-size: 5
+      min-idle: 5
+      max-active: 20
+      max-wait: 60000
+      time-between-eviction-runs-millis: 60000
+      min-evictable-idle-time-millis: 300000
+      validation-query: SELECT 'x'
+      validation-query-timeout: 6
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      pool-prepared-statements: false
+      max-pool-prepared-statement-per-connection-size: 20
+      filters: stat
+      connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
+  #渲染模板配置
+  thymeleaf:
+    #模板的模式，支持 HTML, XML TEXT JAVASCRIPT
+    mode: HTML5
+    #编码 可不用配置
+    encoding: UTF-8
+    #内容类别,可不用配置
+    #开发配置为false,避免修改模板还要重启服务器
+    cache: false
+    #配置模板路径，默认是templates，可以不用配置
+    prefix: classpath:/templates
+    #默认类型
+    servlet:
+      content-type: text/html
+#mybatis配置
+mybatis:
+  mapper-locations: classpath:mapping/*.xml
+  type-aliases-package: com.easystudy.model
+#日志配置
+logging:
+  config: classpath:logback.xml
+  level:
+    com.easystudy.mapper: DEBUG
+#actuator: 
+info:
+  author:
+    name: 李祥祥
+    email: lixx2048@163.com
+  hostory:
+  - date: 2018-08-28 10:10:10
+    user: lixx2048@163.com
+    contact: 941415509(QQ)
+  build:
+    artifact: "@project.artifactId@"
+    name: "@project.name@"
+    version: "@project.version@"

@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.easystudy.mapper.UserRoleMapper">
+  <resultMap id="BaseResultMap" type="com.easystudy.model.UserRole">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="userId" jdbcType="BIGINT" property="userId" />
+    <result column="roleId" jdbcType="BIGINT" property="roleId" />
+    <result column="reserver1" jdbcType="VARCHAR" property="reserver1" />
+    <result column="reserver2" jdbcType="VARCHAR" property="reserver2" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, userId, roleId, reserver1, reserver2
+  </sql>
+  <!-- 基本列:别名 -->
+  <sql id="Alias_Column_List" >
+    ${alias}.id, ${alias}.userId, ${alias}.roleId, ${alias}.reserver1, ${alias}.reserver2
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_user_role
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <!-- 通过主键检索 -->
+  <select id="selectByUserId" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_user_role
+    where t_user_role.userId = #{userId,jdbcType=BIGINT}
+  </select>
+   <!-- 分页获取记录 -->
+  <select id="selectByPage" resultMap="BaseResultMap">
+  	select 
+    <include refid="Base_Column_List" />
+    from t_user,t_role
+    where t_user.roleId = t_role.id 
+    limit #{pageIndex},#{pageSize}
+  </select>
+  <!-- 通过用户名检索 -->
+  <select id="selectByUsername" resultMap="BaseResultMap" parameterType="java.lang.String" >
+  	select 
+    <include refid="Base_Column_List" />
+    from t_user,t_role
+    where t_user.roleId = t_role.id and t_user.username = #{userName,jdbcType=VARCHAR}
+  </select>
+  <!-- 通过角色id检索    <include refid="Alias_Column_List">
+    	<property name="alias" value="u"/>
+    </include> -->
+  <select id="selectByRoleId" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+  	select 
+	<include refid="Base_Column_List" />
+    from t_user_role
+    where roleId = #{roleId,jdbcType=BIGINT}
+  </select>
+  <!-- 通过角色id删除 -->
+  <delete id="deleteByRoleId" parameterType="java.lang.Long" >
+    delete from t_user_role
+    where roleId = #{roleId,jdbcType=BIGINT}
+  </delete>
+  <!-- void deleteByUserRoleId(@Param("userId")Long userId, @Param("roleId")Long roleId); -->
+  <delete id="deleteByUserRoleId" >
+    delete from t_user_role
+    where userId = #{userId,jdbcType=BIGINT} and roleId = #{roleId,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from t_user_role
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.easystudy.model.UserRole" useGeneratedKeys="true" keyProperty="id" >
+    insert into t_user_role (id, userId, roleId, 
+      reserver1, reserver2)
+    values (#{id,jdbcType=BIGINT}, #{userId,jdbcType=BIGINT}, #{roleId,jdbcType=BIGINT}, 
+      #{reserver1,jdbcType=VARCHAR}, #{reserver2,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.easystudy.model.UserRole" useGeneratedKeys="true" keyProperty="id" >
+    insert into t_user_role
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="userId != null">
+        userId,
+      </if>
+      <if test="roleId != null">
+        roleId,
+      </if>
+      <if test="reserver1 != null">
+        reserver1,
+      </if>
+      <if test="reserver2 != null">
+        reserver2,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=BIGINT},
+      </if>
+      <if test="roleId != null">
+        #{roleId,jdbcType=BIGINT},
+      </if>
+      <if test="reserver1 != null">
+        #{reserver1,jdbcType=VARCHAR},
+      </if>
+      <if test="reserver2 != null">
+        #{reserver2,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.easystudy.model.UserRole">
+    update t_user_role
+    <set>
+      <if test="userId != null">
+        userId = #{userId,jdbcType=BIGINT},
+      </if>
+      <if test="roleId != null">
+        roleId = #{roleId,jdbcType=BIGINT},
+      </if>
+      <if test="reserver1 != null">
+        reserver1 = #{reserver1,jdbcType=VARCHAR},
+      </if>
+      <if test="reserver2 != null">
+        reserver2 = #{reserver2,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.easystudy.model.UserRole">
+    update t_user_role
+    set userId = #{userId,jdbcType=BIGINT},
+      roleId = #{roleId,jdbcType=BIGINT},
+      reserver1 = #{reserver1,jdbcType=VARCHAR},
+      reserver2 = #{reserver2,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

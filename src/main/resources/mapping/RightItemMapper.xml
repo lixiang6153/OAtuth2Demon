@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.easystudy.mapper.RightItemMapper" >
+  <resultMap id="BaseResultMap" type="com.easystudy.model.RightItem" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="rightId" property="rightId" jdbcType="INTEGER" />
+    <result column="urlId" property="urlId" jdbcType="INTEGER" />
+    <result column="reserver1" property="reserver1" jdbcType="VARCHAR" />
+    <result column="reserver2" property="reserver2" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, rightId, urlId, reserver1, reserver2
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_right_item
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from t_right_item
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.easystudy.model.RightItem" useGeneratedKeys="true" keyProperty="id" >
+    insert into t_right_item (id, rightId, urlId, 
+      reserver1, reserver2)
+    values (#{id,jdbcType=INTEGER}, #{rightId,jdbcType=INTEGER}, #{urlId,jdbcType=INTEGER}, 
+      #{reserver1,jdbcType=VARCHAR}, #{reserver2,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.easystudy.model.RightItem" useGeneratedKeys="true" keyProperty="id" >
+    insert into t_right_item
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="rightId != null" >
+        rightId,
+      </if>
+      <if test="urlId != null" >
+        urlId,
+      </if>
+      <if test="reserver1 != null" >
+        reserver1,
+      </if>
+      <if test="reserver2 != null" >
+        reserver2,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="rightId != null" >
+        #{rightId,jdbcType=INTEGER},
+      </if>
+      <if test="urlId != null" >
+        #{urlId,jdbcType=INTEGER},
+      </if>
+      <if test="reserver1 != null" >
+        #{reserver1,jdbcType=VARCHAR},
+      </if>
+      <if test="reserver2 != null" >
+        #{reserver2,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.easystudy.model.RightItem" >
+    update t_right_item
+    <set >
+      <if test="rightId != null" >
+        rightId = #{rightId,jdbcType=INTEGER},
+      </if>
+      <if test="urlId != null" >
+        urlId = #{urlId,jdbcType=INTEGER},
+      </if>
+      <if test="reserver1 != null" >
+        reserver1 = #{reserver1,jdbcType=VARCHAR},
+      </if>
+      <if test="reserver2 != null" >
+        reserver2 = #{reserver2,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.easystudy.model.RightItem" >
+    update t_right_item
+    set rightId = #{rightId,jdbcType=INTEGER},
+      urlId = #{urlId,jdbcType=INTEGER},
+      reserver1 = #{reserver1,jdbcType=VARCHAR},
+      reserver2 = #{reserver2,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

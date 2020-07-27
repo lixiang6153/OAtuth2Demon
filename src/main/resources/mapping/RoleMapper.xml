@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.easystudy.mapper.RoleMapper" >
+  <!-- 结果映射集 -->
+  <resultMap id="BaseResultMap" type="com.easystudy.model.Role" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="description" property="description" jdbcType="VARCHAR" />
+    <result column="userType" property="userType" jdbcType="TINYINT" />
+    <result column="relativeId" property="relativeId" jdbcType="VARCHAR" />
+    <result column="createUser" property="createUser" jdbcType="VARCHAR" />
+    <result column="reserver1" property="reserver1" jdbcType="VARCHAR" />
+    <result column="reserver2" property="reserver2" jdbcType="VARCHAR" />
+  </resultMap>
+  <!-- 基本列:复用 -->
+  <sql id="Base_Column_List" >
+    id, name, description, userType, relativeId, createUser, reserver1, reserver2
+  </sql>
+  <!-- 基本列:别名 -->
+  <sql id="Alias_Column_List" >
+    ${alias}.id, ${alias}.name, ${alias}.description, ${alias}.userType, 
+    ${alias}.relativeId, 
+    ${alias}.createUser, 
+    ${alias}.reserver1, 
+    ${alias}.reserver2
+  </sql>
+  <!-- 通过主键检索 -->
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_role
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <!-- 通过主键检索 -->
+  <select id="selectByRoleName" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_role
+    where name = #{name,jdbcType=VARCHAR}
+  </select>
+  <!-- 检索所有记录 -->
+  <select id="selectAll" resultMap="BaseResultMap">
+  	select 
+    <include refid="Base_Column_List" />
+    from t_role
+  </select>
+  <!-- 查找总数 -->
+  <select id="selectMax"  resultType="long">
+    select count(1) from t_role 
+  </select>
+  <select id="selectMaxByAttributes" resultType="long">
+  	select count(id) from t_role
+  	<where>
+  		<if test="roleName != null and roleName.length() > 0">
+  			name = #{roleName,jdbcType=VARCHAR}
+  		</if>
+  		<if test="relativeId != null and relativeId.length() > 0">
+  			and relativeId = #{relativeId,jdbcType=VARCHAR}
+  		</if>
+  		<if test="createUser != null and createUser.length() > 0">
+  			and createUser = #{createUser,jdbcType=VARCHAR}
+  		</if>
+  		<if test="userType != null">
+    		and userType = #{userType, jdbcType=TINYINT}
+    	</if>
+  	</where>
+  </select>	
+  <!-- 通过名称检索 
+  List<Role> selectByAttributes(@Param("name")String name, @Param("pageIndex")Long pageIndex, @Param("pageSize")Long pageSize);
+  -->
+  <select id="selectByAttributes" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from t_role
+    <where>
+    	<if test="name != null">
+    		name = #{name,jdbcType=VARCHAR}
+    	</if>
+    	<if test="relativeId != null and relativeId.length() > 0">
+  			and relativeId = #{relativeId,jdbcType=VARCHAR}
+  		</if>
+    	<if test="createUser != null and createUser.length() > 0">
+  			and createUser = #{createUser,jdbcType=VARCHAR}
+  		</if>
+  		<if test="userType != null">
+    		and userType = #{userType, jdbcType=TINYINT}
+    	</if>
+    </where>
+    limit #{pageIndex},#{pageSize}
+  </select>
+  <!-- 通过用户ID检索 -->
+  <select id="selectByUserId" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Alias_Column_List" ><property name="alias" value="r"/></include>
+    from t_role r 
+    join t_user_role ur on ur.roleId=r.id
+    join t_user u on u.id=ur.userId
+    where u.id = #{userId,jdbcType=BIGINT}
+  </select>
+  <!-- 通过用户名检索 -->
+  <select id="selectByUserName" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Alias_Column_List" ><property name="alias" value="r"/></include>
+    from t_role r 
+    join t_user_role ur on ur.roleId=r.id
+    join t_user u on u.id=ur.userId
+    where u.username = #{userName,jdbcType=VARCHAR}
+  </select>
+  <!-- 通过主键删除 -->
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from t_role
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <!-- 保存记录 -->
+  <insert id="insert" parameterType="com.easystudy.model.Role" useGeneratedKeys="true" keyProperty="id" >
+    insert into t_role (id, name, description, userType, relativeId, createUser, reserver1, reserver2)
+    values (#{id,jdbcType=BIGINT}, #{name,jdbcType=VARCHAR}, 
+    		#{description,jdbcType=VARCHAR}, 
+    	    #{userType,jdbcType=TINYINT}, 
+    	    #{relativeId,jdbcType=VARCHAR}, 
+    	    #{createUser,jdbcType=VARCHAR}, 
+            #{reserver1,jdbcType=VARCHAR}, 
+            #{reserver2,jdbcType=VARCHAR})
+  </insert>
+  <!-- 保存记录的非空列 -->
+  <insert id="insertSelective" parameterType="com.easystudy.model.Role" useGeneratedKeys="true" keyProperty="id" >
+    insert into t_role
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="description != null" >
+        description,
+      </if>
+      <if test="userType != null">
+  		userType,
+  	  </if>
+      <if test="relativeId != null" >
+        relativeId,
+      </if>
+      <if test="createUser != null" >
+        createUser,
+      </if>
+      <if test="reserver1 != null" >
+        reserver1,
+      </if>
+      <if test="reserver2 != null" >
+        reserver2,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null" >
+        #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="userType != null" >
+        #{userType,jdbcType=TINYINT},
+      </if>
+      <if test="relativeId != null" >
+        #{relativeId,jdbcType=VARCHAR},
+      </if>
+      <if test="createUser != null" >
+        #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="reserver1 != null" >
+        #{reserver1,jdbcType=VARCHAR},
+      </if>
+      <if test="reserver2 != null" >
+        #{reserver2,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <!-- 更新非空列 -->
+  <update id="updateByPrimaryKeySelective" parameterType="com.easystudy.model.Role" >
+    update t_role
+    <set >
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null" >
+        description = #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="userType != null" >
+        userType = #{userType,jdbcType=TINYINT},
+      </if>
+      <if test="relativeId != null" >
+        relativeId = #{relativeId,jdbcType=VARCHAR},
+      </if>
+      <if test="createUser != null" >
+        createUser = #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="reserver1 != null" >
+        reserver1 = #{reserver1,jdbcType=VARCHAR},
+      </if>
+      <if test="reserver2 != null" >
+        reserver2 = #{reserver2,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <!-- 更新记录所有列 -->
+  <update id="updateByPrimaryKey" parameterType="com.easystudy.model.Role" >
+    update t_role
+      set name = #{name,jdbcType=VARCHAR},
+      description = #{description,jdbcType=VARCHAR},
+      userType = #{userType,jdbcType=TINYINT},
+      relativeId = #{relativeId,jdbcType=VARCHAR},
+      createUser = #{createUser,jdbcType=VARCHAR},
+      reserver1 = #{reserver1,jdbcType=VARCHAR},
+      reserver2 = #{reserver2,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>
